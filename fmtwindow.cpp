@@ -45,8 +45,9 @@ void FmtWindow::init()
     dock->setWidget(fmtList);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
 
-    ui->tabWidget->addTab(cppCodeEditor, QIcon(":/cplusplus"), tr("C++ Код"));
-    setCentralWidget(ui->tabWidget);
+    tabWidget = new QTabWidget(this);
+    tabWidget->addTab(cppCodeEditor, QIcon(":/cplusplus"), tr("C++ Код"));
+    setCentralWidget(tabWidget);
     fmtModel->updateFmtModel();
 
     connect(fmtModel, SIGNAL(findItemSelection(QModelIndex)), SLOT(onFoundCurItem(QModelIndex)));

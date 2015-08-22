@@ -28,7 +28,7 @@ public:
     qint16 getType() const { return _type; }
     qint32 getSize() const { return _size; }
     QString getTypeName() const;
-    
+
     QString getCppDecl() const { return _cppDecl; }
 
     static QString getCppTypeName(const qint16 &type);
@@ -39,6 +39,11 @@ private:
     QString _name, _comment, _cppDecl;
     qint16 _type;
     qint32 _size, _id;
+};
+
+class FmtIndex
+{
+    
 };
 
 class FmtObject

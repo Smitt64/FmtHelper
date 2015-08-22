@@ -43,6 +43,7 @@ private:
     QListView *fmtList;
     CodeEditor *cppCodeEditor;
     QSqlDatabase db;
+    QTabWidget *tabWidget;
     FmtListModel *fmtModel;
     Highlighter *cppHighlighter;
 };

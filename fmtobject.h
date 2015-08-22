@@ -29,11 +29,14 @@ public:
     qint32 getSize() const { return _size; }
     QString getTypeName() const;
 
+    QString getCppDecl() const { return _cppDecl; }
+
     static QString getCppTypeName(const qint16 &type);
 private:
     FmtField(const qint32 &id, const qint32 &size, const qint16 &type, const QString &name, const QString &comment, const QSqlDatabase &db);
+    void init();
     QSqlDatabase _db;
-    QString _name, _comment;
+    QString _name, _comment, _cppDecl;
     qint16 _type;
     qint32 _size, _id;
 };

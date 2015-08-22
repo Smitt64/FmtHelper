@@ -45,7 +45,16 @@ FmtField::FmtField(const qint32 &id, const qint32 &size,
 
 void FmtField::init()
 {
-
+    if (_type == fmt_charptr)
+    {
+        _cppDecl = QString("%1[%2]")
+                .arg(_name)
+                .arg(_size);
+    }
+    else
+    {
+        _cppDecl = _name;
+    }
 }
 
 QString FmtField::getTypeName() const
@@ -139,7 +148,7 @@ qint16 FmtObject::calcMaxCppLenght(qint16 *maxfieldname)
 
     foreach (FmtField *f, fields) {
         len = qMax(len, (qint16)f->getTypeName().length());
-        fieldname = qMax(fieldname, (qint16)f->getName().length());
+        fieldname = qMax(fieldname, (qint16)f->getCppDecl().length());
     }
 
     if (maxfieldname)
@@ -201,7 +210,7 @@ void FmtObject::makeStruct(QTextStream *stream)
     qint16 maxlen = calcMaxCppLenght(&fldname);
     foreach (FmtField *f, fields) {
         *stream << "\t" << f->getTypeName().leftJustified(maxlen) << " ";
-        *stream << QString("%1;").arg(f->getName()).leftJustified(fldname + 1) << " // " << f->getComment() <<endl;
+        *stream << QString("%1;").arg(f->getCppDecl()).leftJustified(fldname + 1) << " // " << f->getComment() <<endl;
     }
 
     *stream << "} " << sStructName << ";" << endl;
