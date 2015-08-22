@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="db">img/base_cylinder_32.png</file>
+        <file>img/Book_angleHS.png</file>
+        <file>img/FindHS.png</file>
+        <file>img/FindNextHS.png</file>
+        <file>img/rfsh.png</file>
+        <file alias="table">img/Table_32.png</file>
+        <file alias="tablet">img/Table_tmp.png</file>
+        <file alias="cplusplus">img/cplusplus.png</file>
+        <file alias="cpprfrsh">img/cpprfrsh.png</file>
+        <file alias="tmptablefound">img/Table_tmp_found.png</file>
+        <file alias="tablefound">img/TableFound.png</file>
+    </qresource>
+</RCC>

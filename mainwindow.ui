@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>16</width>
+    <height>16</height>
+   </size>
+  </property>
+  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuConnection">
+    <property name="title">
+     <string>Подключение</string>
+    </property>
+    <addaction name="actionConnect"/>
+   </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Правка</string>
+    </property>
+    <addaction name="actionFind"/>
+    <addaction name="actionFindNext"/>
+    <addaction name="separator"/>
+    <addaction name="actionCppRefrsh"/>
+    <addaction name="actionTablesRefresh"/>
+   </widget>
+   <addaction name="menuConnection"/>
+   <addaction name="menu"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionConnect">
+   <property name="icon">
+    <iconset resource="fmt.qrc">
+     <normaloff>:/db</normaloff>:/db</iconset>
+   </property>
+   <property name="text">
+    <string>Подключиться</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="icon">
+    <iconset resource="fmt.qrc">
+     <normaloff>:/img/FindHS.png</normaloff>:/img/FindHS.png</iconset>
+   </property>
+   <property name="text">
+    <string>Найти</string>
+   </property>
+  </action>
+  <action name="actionFindNext">
+   <property name="icon">
+    <iconset resource="fmt.qrc">
+     <normaloff>:/img/FindNextHS.png</normaloff>:/img/FindNextHS.png</iconset>
+   </property>
+   <property name="text">
+    <string>Найти далее</string>
+   </property>
+  </action>
+  <action name="actionCppRefrsh">
+   <property name="icon">
+    <iconset resource="fmt.qrc">
+     <normaloff>:/cpprfrsh</normaloff>:/cpprfrsh</iconset>
+   </property>
+   <property name="text">
+    <string>Обновить код</string>
+   </property>
+  </action>
+  <action name="actionTablesRefresh">
+   <property name="icon">
+    <iconset resource="fmt.qrc">
+     <normaloff>:/img/rfsh.png</normaloff>:/img/rfsh.png</iconset>
+   </property>
+   <property name="text">
+    <string>Обновить список таблиц</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="fmt.qrc"/>
+ </resources>
+ <connections/>
+</ui>
