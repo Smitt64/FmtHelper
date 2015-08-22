@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     fmtwindow.cpp \
     oracleauthdlg.cpp \
     fmtlistmodel.cpp \
-    fmtobject.cpp
+    fmtobject.cpp \
+    fmtindex.cpp
 
 HEADERS  += mainwindow.h \
     codeeditor.h \
@@ -27,7 +28,8 @@ HEADERS  += mainwindow.h \
     fmtwindow.h \
     oracleauthdlg.h \
     fmtlistmodel.h \
-    fmtobject.h
+    fmtobject.h \
+    fmtindex.h
 
 FORMS    += mainwindow.ui \
     fmtwindow.ui \

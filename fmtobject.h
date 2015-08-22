@@ -6,6 +6,8 @@
 #include <QModelIndex>
 #include <QTextStream>
 
+class FmtIndex;
+
 class FmtField
 {
     friend class FmtObject;
@@ -32,6 +34,9 @@ public:
     QString getCppDecl() const { return _cppDecl; }
 
     static QString getCppTypeName(const qint16 &type);
+
+    bool operator == (const FmtField &other);
+    bool operator == (const qint32 &id);
 private:
     FmtField(const qint32 &id, const qint32 &size, const qint16 &type, const QString &name, const QString &comment, const QSqlDatabase &db);
     void init();
@@ -43,6 +48,7 @@ private:
 
 class FmtObject
 {
+    friend class FmtIndex;
 public:
     FmtObject(const QModelIndex &fmtnames, const QSqlDatabase &db);
     QString getName() const { return name; }
@@ -61,11 +67,14 @@ public:
 private:
     void makeOpener(QTextStream *stream);
     void makeStruct(QTextStream *stream);
+    void makeKeysUnion(QTextStream *stream);
+
     QString tryToFormatField(const QString &name);
     QString name, comment, sStructName;
     qint32 id;
 
-    QList<FmtField*> fields;
+    QMap<qint32, FmtField*> fields;
+    QList<FmtIndex*> indeces;
 
     bool fTmp;
     QSqlDatabase _db;

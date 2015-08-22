@@ -1,11 +1,8 @@
 #include "fmtobject.h"
+#include "fmtindex.h"
 
 FmtField::FmtField(qint32 id, const QSqlDatabase &db)
 {
-    /*_name = _id;
-    _comment = comment;
-    _type = type;
-    _size = size;*/
     _db = db;
     _id = id;
 
@@ -96,6 +93,16 @@ QString FmtField::getCppTypeName(const qint16 &type)
     return t;
 }
 
+bool FmtField::operator == (const FmtField &other)
+{
+    return _id == other._id;
+}
+
+bool FmtField::operator == (const qint32 &id)
+{
+    return _id == id;
+}
+
 // ========================================================================
 
 FmtObject::FmtObject(const QModelIndex &fmtnames, const QSqlDatabase &db):
@@ -134,11 +141,39 @@ FmtObject::FmtObject(const QModelIndex &fmtnames, const QSqlDatabase &db):
 
     while (qf.next())
     {
-        fields.append(new FmtField(qf.value(0).toInt(),
+        fields.insert(qf.value(0).toInt(), new FmtField(qf.value(0).toInt(),
                                    qf.value(1).toInt(),
                                    qf.value(2).toInt(),
                                    qf.value(3).toString(),
                                    qf.value(4).toString(), _db));
+    }
+
+    QSqlQuery qi(_db);
+    qi.prepare(QString("SELECT K .T_KEYNUM, f.T_NAME, f.T_TYPE, f.T_SIZE") +
+#ifndef HELPER_SQLITE
+               QString(", NVL(k.T_COMMENT, f.T_COMMENT)") +
+#else
+               QString(", k.T_COMMENT") +
+#endif
+               QString(", K.T_FMTFLDID FROM ") +
+               QString("FMT_KEYS K, FMT_FIELDS f WHERE K .T_FMTID = :fmt AND K .T_FMTFLDID = f.T_ID ORDER BY K .T_KEYNUM,K .T_SEGNUM"));
+    qi.bindValue(":fmt", id);
+
+    if (!qi.exec())
+    {
+        throw 3;
+    }
+
+    int prevkey = -1;
+    while (qi.next())
+    {
+        if (prevkey != qi.value(0).toInt())
+        {
+            indeces.append(new FmtIndex(qi.value(0).toInt(), qi.value(4).toString(), this));
+            prevkey = qi.value(0).toInt();
+        }
+
+        indeces.last()->pushField(fields[qi.value(5).toInt()]);
     }
 }
 
@@ -146,7 +181,11 @@ qint16 FmtObject::calcMaxCppLenght(qint16 *maxfieldname)
 {
     qint16 len = 0, fieldname = 0;
 
-    foreach (FmtField *f, fields) {
+    QMapIterator<qint32, FmtField *> i(fields);
+    while(i.hasNext())
+    {
+        i.next();
+        FmtField *f = i.value();
         len = qMax(len, (qint16)f->getTypeName().length());
         fieldname = qMax(fieldname, (qint16)f->getCppDecl().length());
     }
@@ -179,6 +218,8 @@ void FmtObject::generateCppCode(QTextStream *stream)
     makeOpener(stream);
     *stream << endl;
     makeStruct(stream);
+    *stream << endl;
+    makeKeysUnion(stream);
 }
 
 void FmtObject::makeOpener(QTextStream *stream)
@@ -208,10 +249,60 @@ void FmtObject::makeStruct(QTextStream *stream)
 
     qint16 fldname = 0;
     qint16 maxlen = calcMaxCppLenght(&fldname);
-    foreach (FmtField *f, fields) {
+
+    QMapIterator<qint32, FmtField*> i(fields);
+    while (i.hasNext())
+    {
+        i.next();
+        FmtField *f = i.value();
         *stream << "\t" << f->getTypeName().leftJustified(maxlen) << " ";
         *stream << QString("%1;").arg(f->getCppDecl()).leftJustified(fldname + 1) << " // " << f->getComment() <<endl;
     }
 
     *stream << "} " << sStructName << ";" << endl;
+}
+
+void FmtObject::makeKeysUnion(QTextStream *stream)
+{
+    *stream << "typedef union" << endl;
+    *stream << "{" << endl;
+
+    foreach (FmtIndex *ind, indeces)
+    {
+        *stream << "\tstruct" << endl;
+        *stream << "\t{" << endl;
+
+        qint16 fldname = 0;
+        qint16 maxlen = ind->calcMaxCppLenght(&fldname);
+
+        for (int i = 0; i < ind->getFldCount(); i++)
+        {
+            const FmtField *f = ind->getField(i);
+            *stream << "\t\t";
+            *stream << f->getTypeName().leftJustified(maxlen) << " ";
+            *stream << QString("%1;").arg(f->getCppDecl()).leftJustified(fldname + 1) << " // " << f->getComment() <<endl;
+        }
+
+        *stream << "\t} k" << ind->getKeyNum() + 1 << ";" << endl;
+
+        if (indeces.last() != ind)
+        {
+            *stream << endl;
+        }
+    }
+
+    *stream << "} " << sStructName << "_KEYS;" << endl << endl;
+
+    *stream << "typedef enum" << endl;
+    *stream << "{" << endl;
+    for (int i = 0; i < indeces.size(); i++)
+    {
+        *stream << "\t" << sStructName << "_KEY" << i + 1;
+        if (i != indeces.size() - 1)
+        {
+            *stream << ",";
+        }
+        *stream << endl;
+    }
+    *stream << "} " << sStructName << "_KEYNUM;" << endl;
 }
