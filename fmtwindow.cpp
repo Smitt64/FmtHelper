@@ -9,6 +9,7 @@
 #include <QSqlQuery>
 #include <QInputDialog>
 #include <QTextStream>
+#include <QFileDialog>
 
 enum FMT_NAMES
 {
@@ -150,5 +151,40 @@ void FmtWindow::onFmtListDoubleClicked(const QModelIndex &index)
     {
         progress->setVisible(true);
         inGenerate = true;
+    }
+}
+
+void FmtWindow::save()
+{
+    QString file, filter;
+    CodeEditor *editor = NULL;
+
+    bool res = true;
+    switch(tabWidget->currentIndex())
+    {
+    case 0: //c++
+        filter = "C files (*.c)";
+        editor = cppCodeEditor;
+        break;
+    case 1: // tables.sql
+        filter = "Sql files (*.sql)";
+        editor = tablesSql;
+        break;
+    default:
+        res = false;
+    }
+
+    file = QFileDialog::getSaveFileName(this, QString(), QString(), filter);
+
+    if (!file.isEmpty())
+    {
+        QFile f(file);
+        if (f.open(QIODevice::WriteOnly))
+        {
+            QTextStream stream(&f);
+            stream.setCodec("IBM 866");
+            stream << editor->toPlainText();
+            f.close();
+        }
     }
 }

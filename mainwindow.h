@@ -20,6 +20,7 @@ private slots:
     void onConnect();
     void findFirst();
     void findNext();
+    void save();
 
 private:
     QMdiArea *mdi;

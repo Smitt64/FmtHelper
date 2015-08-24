@@ -17,11 +17,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->mainToolBar->addAction(ui->actionConnect);
     ui->mainToolBar->addSeparator();
+    ui->mainToolBar->addAction(ui->actionSave);
+    ui->mainToolBar->addSeparator();
     ui->mainToolBar->addAction(ui->actionFind);
     ui->mainToolBar->addAction(ui->actionFindNext);
     ui->mainToolBar->addAction(ui->actionCppRefrsh);
     ui->mainToolBar->addAction(ui->actionTablesRefresh);
 
+    ui->actionSave->setShortcut(QKeySequence(QKeySequence::Save));
     ui->actionFind->setShortcut(QKeySequence(QKeySequence::Find));
     ui->actionConnect->setShortcut(QKeySequence(QKeySequence::Open));
     ui->actionCppRefrsh->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
@@ -33,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionConnect, SIGNAL(triggered(bool)), SLOT(onConnect()));
     connect(ui->actionFind, SIGNAL(triggered(bool)), SLOT(findFirst()));
     connect(ui->actionFindNext, SIGNAL(triggered(bool)), SLOT(findNext()));
+    connect(ui->actionSave, SIGNAL(triggered(bool)), SLOT(save()));
 }
 
 MainWindow::~MainWindow()
@@ -78,4 +82,15 @@ void MainWindow::findNext()
 
     FmtWindow *w = (FmtWindow*)window->widget();
     w->findNext();
+}
+
+void MainWindow::save()
+{
+    QMdiSubWindow *window = mdi->currentSubWindow();
+
+    if (!window)
+        return;
+
+    FmtWindow *w = (FmtWindow*)window->widget();
+    w->save();
 }

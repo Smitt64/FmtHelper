@@ -29,6 +29,7 @@ public:
 
     void findFirst();
     void findNext();
+    void save();
 
     QString connectionName() const;
 

@@ -14,5 +14,6 @@
         <file alias="sql_keys">sql_keys.txt</file>
         <file alias="sql">img/SQL.png</file>
         <file alias="icon">img/icon.png</file>
+        <file alias="save">img/saveHS.png</file>
     </qresource>
 </RCC>
