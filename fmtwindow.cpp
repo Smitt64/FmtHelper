@@ -42,6 +42,10 @@ void FmtWindow::init()
     tablesSql = new CodeEditor(this);
     updScriptCodeEditor = new CodeEditor(this);
 
+    cppCodeEditor->setReadOnly(true);
+    tablesSql->setReadOnly(true);
+    updScriptCodeEditor->setReadOnly(true);
+
     cppHighlighter = new Highlighter(cppCodeEditor->document());
     tablesSqlHlght = new SqlHighlighter(tablesSql->document());
     updScriptHlght = new SqlHighlighter(updScriptCodeEditor->document());

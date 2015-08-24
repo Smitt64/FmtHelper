@@ -505,12 +505,15 @@ void FmtObject::generateUpdateScript(QTextStream *stream)
 
     *stream << "\tEXECUTE IMMEDIATE " << endl;
 
+    qint16 fldLen = 0;
+    qint16 len = calcMaxOraLenght(&fldLen) + 5;
+    len += fldLen;
     while(!tmpstream.atEnd())
     {
         QString s = tmpstream.readLine();
-        *stream << "\t\t'" << s << "'";
+        *stream << "\t\t'" << s.leftJustified(len) << "'";
 
-        if (s == ")")
+        if (s.at(0) == ')')
         {
             *stream << ";" << endl;
         }
