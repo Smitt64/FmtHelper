@@ -2,7 +2,9 @@
 #include "ui_fmtwindow.h"
 #include "oracleauthdlg.h"
 #include "fmtobject.h"
+#include "fmtgenrunnable.h"
 #include <QMessageBox>
+#include <QThreadPool>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QInputDialog>
@@ -17,7 +19,8 @@ enum FMT_NAMES
 
 FmtWindow::FmtWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(NULL)
+    ui(NULL),
+    inGenerate(false)
 {
 }
 
@@ -35,7 +38,9 @@ void FmtWindow::init()
     ui->setupUi(this);
 
     cppCodeEditor = new CodeEditor(this);
+    tablesSql = new CodeEditor(this);
     cppHighlighter = new Highlighter(cppCodeEditor->document());
+    tablesSqlHlght = new SqlHighlighter(tablesSql->document());
 
     fmtList = new QListView(this);
     fmtModel = new FmtListModel(&db, this);
@@ -47,8 +52,16 @@ void FmtWindow::init()
 
     tabWidget = new QTabWidget(this);
     tabWidget->addTab(cppCodeEditor, QIcon(":/cplusplus"), tr("C++ Код"));
+    tabWidget->addTab(tablesSql, QIcon(":/sql"), tr("tables.sql"));
     setCentralWidget(tabWidget);
     fmtModel->updateFmtModel();
+
+    progress = new QProgressBar(this);
+    progress->setRange(0, 0);
+    progress->setValue(0);
+    progress->setTextVisible(false);
+    progress->setVisible(false);
+    tabWidget->setCornerWidget(progress);
 
     connect(fmtModel, SIGNAL(findItemSelection(QModelIndex)), SLOT(onFoundCurItem(QModelIndex)));
     connect(fmtList, SIGNAL(doubleClicked(QModelIndex)), SLOT(onFmtListDoubleClicked(QModelIndex)));
@@ -108,19 +121,34 @@ void FmtWindow::fillFmtNames()
 
 }
 
+void FmtWindow::onStepGenFinish(const QString &text, const qint16 &step)
+{
+    switch(step)
+    {
+    case FmtGenRunnable::GEN_CPP:
+        cppCodeEditor->setText(text);
+        break;
+    case FmtGenRunnable::GEN_TABLE:
+        tablesSql->setText(text);
+        break;
+    };
+}
+
+void FmtWindow::onGenerationFinish(const qint16 &result)
+{
+    progress->setVisible(false);
+    inGenerate = false;
+}
+
 void FmtWindow::onFmtListDoubleClicked(const QModelIndex &index)
 {
-    QString cpp;
-    QTextStream stream(&cpp);
+    FmtGenRunnable *gen = new FmtGenRunnable(index, db);
+    connect(gen, SIGNAL(stepFinish(QString,qint16)), SLOT(onStepGenFinish(QString,qint16)));
+    connect(gen, SIGNAL(finished(qint16)), SLOT(onGenerationFinish(qint16)));
 
-    try
+    if (!inGenerate && QThreadPool::globalInstance()->tryStart(gen))
     {
-        FmtObject obj(index, db);
-        obj.generateCppCode(&stream);
-        cppCodeEditor->setText(cpp);
-    }
-    catch(...)
-    {
-
+        progress->setVisible(true);
+        inGenerate = true;
     }
 }

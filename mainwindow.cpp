@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionTablesRefresh->setShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_R));
     ui->actionFindNext->setShortcut(QKeySequence(Qt::Key_F3));
 
+    setWindowIcon(QIcon(":/icon"));
+
     connect(ui->actionConnect, SIGNAL(triggered(bool)), SLOT(onConnect()));
     connect(ui->actionFind, SIGNAL(triggered(bool)), SLOT(findFirst()));
     connect(ui->actionFindNext, SIGNAL(triggered(bool)), SLOT(findNext()));

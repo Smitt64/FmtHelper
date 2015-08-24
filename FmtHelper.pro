@@ -11,7 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = FmtHelper
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
         mainwindow.cpp \
     codeeditor.cpp \
@@ -20,7 +19,8 @@ SOURCES += main.cpp\
     oracleauthdlg.cpp \
     fmtlistmodel.cpp \
     fmtobject.cpp \
-    fmtindex.cpp
+    fmtindex.cpp \
+    fmtgenrunnable.cpp
 
 HEADERS  += mainwindow.h \
     codeeditor.h \
@@ -29,7 +29,8 @@ HEADERS  += mainwindow.h \
     oracleauthdlg.h \
     fmtlistmodel.h \
     fmtobject.h \
-    fmtindex.h
+    fmtindex.h \
+    fmtgenrunnable.h
 
 FORMS    += mainwindow.ui \
     fmtwindow.ui \

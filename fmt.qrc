@@ -11,5 +11,8 @@
         <file alias="cpprfrsh">img/cpprfrsh.png</file>
         <file alias="tmptablefound">img/Table_tmp_found.png</file>
         <file alias="tablefound">img/TableFound.png</file>
+        <file alias="sql_keys">sql_keys.txt</file>
+        <file alias="sql">img/SQL.png</file>
+        <file alias="icon">img/icon.png</file>
     </qresource>
 </RCC>

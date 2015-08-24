@@ -27,13 +27,17 @@ public:
     FmtField(qint32 id, const QSqlDatabase &db);
     QString getComment() const { return _comment; }
     QString getName() const { return _name; }
+    QString getOraName() const { return _oraName; }
     qint16 getType() const { return _type; }
     qint32 getSize() const { return _size; }
     QString getTypeName() const;
+    QString getOraTypeName() const;
 
     QString getCppDecl() const { return _cppDecl; }
+    QString getOraDecl() const { return _oraDecl; }
 
     static QString getCppTypeName(const qint16 &type);
+    static QString getOracleTypeName(const qint16 &type);
 
     bool operator == (const FmtField &other);
     bool operator == (const qint32 &id);
@@ -41,7 +45,7 @@ private:
     FmtField(const qint32 &id, const qint32 &size, const qint16 &type, const QString &name, const QString &comment, const QSqlDatabase &db);
     void init();
     QSqlDatabase _db;
-    QString _name, _comment, _cppDecl;
+    QString _name, _comment, _cppDecl, _oraDecl, _oraName;
     qint16 _type;
     qint32 _size, _id;
 };
@@ -61,8 +65,10 @@ public:
     qint32 getId() const { return id; }
 
     void generateCppCode(QTextStream *stream);
+    void generateSqls(QTextStream *tablessql, QTextStream *plslq);
 
     qint16 calcMaxCppLenght(qint16 *maxfieldname);
+    qint16 calcMaxOraLenght(qint16 *maxfieldname);
 
 private:
     void makeOpener(QTextStream *stream);

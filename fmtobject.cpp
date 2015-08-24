@@ -32,6 +32,7 @@ FmtField::FmtField(const qint32 &id, const qint32 &size,
     _comment = comment;
     _type = type;
     _name = name;
+    _oraName = name.toUpper();
     _name = _name.remove("t_", Qt::CaseInsensitive);
     _size = size;
     _db = db;
@@ -47,16 +48,26 @@ void FmtField::init()
         _cppDecl = QString("%1[%2]")
                 .arg(_name)
                 .arg(_size);
+
+        _oraDecl = QString("%1(%2)")
+                .arg(getOraTypeName())
+                .arg(_size);
     }
     else
     {
         _cppDecl = _name;
+        _oraDecl = getOraTypeName();
     }
 }
 
 QString FmtField::getTypeName() const
 {
     return getCppTypeName(_type);
+}
+
+QString FmtField::getOraTypeName() const
+{
+    return getOracleTypeName(_type);
 }
 
 QString FmtField::getCppTypeName(const qint16 &type)
@@ -85,6 +96,42 @@ QString FmtField::getCppTypeName(const qint16 &type)
         break;
     case fmt_lmoney:
         t = "db_lmoney";
+        break;
+    default:
+        t = "<unknown>";
+    }
+
+    return t;
+}
+
+QString FmtField::getOracleTypeName(const qint16 &type)
+{
+    QString t;
+    switch(type)
+    {
+    case fmt_int16:
+        t = "NUMBER(5)";
+        break;
+    case fmt_int32:
+        t = "NUMBER(10)";
+        break;
+    /*case fmt_float:
+        t = "float";
+        break;*/
+    case fmt_char:
+        t = "CHAR";
+        break;
+    case fmt_charptr:
+        t = "VARCHAR";
+        break;
+    case fmt_bdate:
+        t = "DATE";
+        break;
+    case fmt_btime:
+        t = "DATE";
+        break;
+    case fmt_lmoney:
+        t = "NUMBER(30,12)";
         break;
     default:
         t = "<unknown>";
@@ -188,6 +235,25 @@ qint16 FmtObject::calcMaxCppLenght(qint16 *maxfieldname)
         FmtField *f = i.value();
         len = qMax(len, (qint16)f->getTypeName().length());
         fieldname = qMax(fieldname, (qint16)f->getCppDecl().length());
+    }
+
+    if (maxfieldname)
+        *maxfieldname = fieldname;
+
+    return len;
+}
+
+qint16 FmtObject::calcMaxOraLenght(qint16 *maxfieldname)
+{
+    qint16 len = 0, fieldname = 0;
+
+    QMapIterator<qint32, FmtField *> i(fields);
+    while(i.hasNext())
+    {
+        i.next();
+        FmtField *f = i.value();
+        len = qMax(len, (qint16)f->getOraDecl().length());
+        fieldname = qMax(fieldname, (qint16)f->getOraName().length());
     }
 
     if (maxfieldname)
@@ -305,4 +371,44 @@ void FmtObject::makeKeysUnion(QTextStream *stream)
         *stream << endl;
     }
     *stream << "} " << sStructName << "_KEYNUM;" << endl;
+}
+
+void FmtObject::generateSqls(QTextStream *tablessql, QTextStream *plslq)
+{
+    *tablessql << "CREATE " << (isTmp() ? "GLOBAL TEMPORARY " : QString("")) << "TABLE " << name.toUpper() << endl;
+    *tablessql << "(" << endl;
+
+    qint16 fldname = 0;
+    qint16 maxlen = calcMaxOraLenght(&fldname);
+    QMapIterator<qint32, FmtField*> i(fields);
+    while (i.hasNext())
+    {
+        i.next();
+        FmtField *f = i.value();
+        *tablessql << "\t" << "T_" << f->getName().toUpper().leftJustified(fldname) << " ";
+        *tablessql << f->getOraDecl();
+
+        if (f != fields.last())
+        {
+            *tablessql << ",";
+        }
+
+        *tablessql << endl;
+    }
+    *tablessql << ");" << endl << endl;
+
+    *tablessql << QString("COMMENT ON TABLE %1 IS '%2';")
+                  .arg(getName().toUpper())
+                  .arg(getComment()) << endl;
+    i.toFront();
+    while (i.hasNext())
+    {
+        i.next();
+        FmtField *f = i.value();
+        *tablessql << QString("COMMENT ON COLUMN %1.%2 IS '%3';")
+                      .arg(getName().toUpper())
+                      .arg(f->getOraName().leftJustified(fldname))
+                      .arg(f->getComment());
+        *tablessql << endl;
+    }
 }
