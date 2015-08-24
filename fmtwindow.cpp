@@ -40,8 +40,11 @@ void FmtWindow::init()
 
     cppCodeEditor = new CodeEditor(this);
     tablesSql = new CodeEditor(this);
+    updScriptCodeEditor = new CodeEditor(this);
+
     cppHighlighter = new Highlighter(cppCodeEditor->document());
     tablesSqlHlght = new SqlHighlighter(tablesSql->document());
+    updScriptHlght = new SqlHighlighter(updScriptCodeEditor->document());
 
     fmtList = new QListView(this);
     fmtModel = new FmtListModel(&db, this);
@@ -54,6 +57,7 @@ void FmtWindow::init()
     tabWidget = new QTabWidget(this);
     tabWidget->addTab(cppCodeEditor, QIcon(":/cplusplus"), tr("C++ Код"));
     tabWidget->addTab(tablesSql, QIcon(":/sql"), tr("tables.sql"));
+    tabWidget->addTab(updScriptCodeEditor, QIcon(":/sql"), tr("update script"));
     setCentralWidget(tabWidget);
     fmtModel->updateFmtModel();
 
@@ -131,6 +135,9 @@ void FmtWindow::onStepGenFinish(const QString &text, const qint16 &step)
         break;
     case FmtGenRunnable::GEN_TABLE:
         tablesSql->setText(text);
+        break;
+    case FmtGenRunnable::GEN_UPD_SCRIPT:
+        updScriptCodeEditor->setText(text);
         break;
     };
 }

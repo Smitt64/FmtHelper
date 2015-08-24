@@ -62,6 +62,11 @@ Highlighter::Highlighter(QTextDocument *parent)
     rule.format = functionFormat;
     highlightingRules.append(rule);
 
+    /*numbersFormat.setForeground(QColor(255, 128, 0));
+    rule.pattern = QRegExp("-?\\d*(\\.\\d+)?$");
+    rule.format = numbersFormat;
+    highlightingRules.append(rule);*/
+
     commentStartExpression = QRegExp("/\\*");
     commentEndExpression = QRegExp("\\*/");
 }

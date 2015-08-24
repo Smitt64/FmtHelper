@@ -66,7 +66,9 @@ public:
     qint32 getId() const { return id; }
 
     void generateCppCode(QTextStream *stream);
-    void generateSqls(QTextStream *tablessql, QTextStream *plslq);
+    void generateSqls(QTextStream *tablessql, bool executeImmediate = false);
+    void generateUpdateScript(QTextStream *stream);
+    void generateAlterUpdateScript(QTextStream *stream);
 
     qint16 calcMaxCppLenght(qint16 *maxfieldname);
     qint16 calcMaxOraLenght(qint16 *maxfieldname);

@@ -13,7 +13,8 @@ public:
     enum GenStep
     {
         GEN_CPP = 1,
-        GEN_TABLE
+        GEN_TABLE,
+        GEN_UPD_SCRIPT,
     };
     FmtGenRunnable(const QModelIndex &index, const QSqlDatabase &db);
     virtual void run();

@@ -446,7 +446,7 @@ void FmtObject::makeKeysUnion(QTextStream *stream)
 
 }
 
-void FmtObject::generateSqls(QTextStream *tablessql, QTextStream *plslq)
+void FmtObject::generateSqls(QTextStream *tablessql, bool executeImmediate)
 {
     *tablessql << "CREATE " << (isTmp() ? "GLOBAL TEMPORARY " : QString("")) << "TABLE " << name.toUpper() << endl;
     *tablessql << "(" << endl;
@@ -468,20 +468,65 @@ void FmtObject::generateSqls(QTextStream *tablessql, QTextStream *plslq)
 
         *tablessql << endl;
     }
-    *tablessql << ")" << (isTmp() ? " ON COMMIT PRESERVE ROWS" : "") << ";" << endl << endl;
+    *tablessql << ")" << (isTmp() ? " ON COMMIT PRESERVE ROWS" : "") << (!executeImmediate ? ";" : "");
 
-    *tablessql << QString("COMMENT ON TABLE %1 IS '%2';")
-                  .arg(getName().toUpper())
-                  .arg(getComment()) << endl;
-    i.toFront();
-    while (i.hasNext())
+    if (!executeImmediate)
     {
-        i.next();
-        FmtField *f = i.value();
-        *tablessql << QString("COMMENT ON COLUMN %1.%2 IS '%3';")
+        *tablessql << endl << endl;
+        *tablessql << QString("COMMENT ON TABLE %1 IS '%2';")
                       .arg(getName().toUpper())
-                      .arg(f->getOraName().leftJustified(fldname))
-                      .arg(f->getComment());
-        *tablessql << endl;
+                      .arg(getComment()) << endl;
+        i.toFront();
+        while (i.hasNext())
+        {
+            i.next();
+            FmtField *f = i.value();
+            *tablessql << QString("COMMENT ON COLUMN %1.%2 IS '%3';")
+                          .arg(getName().toUpper())
+                          .arg(f->getOraName().leftJustified(fldname))
+                          .arg(f->getComment());
+            *tablessql << endl;
+        }
     }
+}
+
+void FmtObject::generateUpdateScript(QTextStream *stream)
+{
+    QString tmp;
+    QTextStream tmpstream(&tmp);
+
+    generateSqls(&tmpstream, true);
+    tmpstream.seek(0);
+
+    *stream << "DECLARE " << endl;
+    *stream << "\te_object_exists EXCEPTION;" << endl;
+    *stream << "\tPRAGMA EXCEPTION_INIT(e_object_exists, -955);" << endl;
+    *stream << "BEGIN" << endl;
+
+    *stream << "\tEXECUTE IMMEDIATE " << endl;
+
+    while(!tmpstream.atEnd())
+    {
+        QString s = tmpstream.readLine();
+        *stream << "\t\t'" << s << "'";
+
+        if (s == ")")
+        {
+            *stream << ";" << endl;
+        }
+        else
+        {
+            *stream << " ||" << endl;
+        }
+    }
+
+    *stream << "EXCEPTION" << endl;
+    *stream << "\tWHEN e_object_exists THEN NULL;" << endl;
+    *stream << "END;" << endl;
+    *stream << "/" << endl;
+}
+
+void FmtObject::generateAlterUpdateScript(QTextStream *stream)
+{
+
 }

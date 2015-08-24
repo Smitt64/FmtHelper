@@ -48,13 +48,13 @@ private:
     Ui::FmtWindow *ui;
     QDockWidget *dock;
     QListView *fmtList;
-    CodeEditor *cppCodeEditor, *tablesSql;
+    CodeEditor *cppCodeEditor, *tablesSql, *updScriptCodeEditor;
     QSqlDatabase db;
     QTabWidget *tabWidget;
     QProgressBar *progress;
     FmtListModel *fmtModel;
     Highlighter *cppHighlighter;
-    SqlHighlighter *tablesSqlHlght;
+    SqlHighlighter *tablesSqlHlght, *updScriptHlght;
 };
 
 #endif // FMTWINDOW_H

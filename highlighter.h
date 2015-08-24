@@ -36,6 +36,8 @@ private:
     QTextCharFormat quotationFormat;
     QTextCharFormat functionFormat;
 
+    QTextCharFormat numbersFormat;
+
     QTextCharFormat keywordFormat2;
 };
 
