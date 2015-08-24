@@ -65,6 +65,13 @@ QString FmtField::getTypeName() const
     return getCppTypeName(_type);
 }
 
+QString FmtField::getTypeName2() const
+{
+    if (_type == fmt_charptr)
+        return "char *";
+    return getTypeName();
+}
+
 QString FmtField::getOraTypeName() const
 {
     return getOracleTypeName(_type);
@@ -294,6 +301,30 @@ void FmtObject::makeOpener(QTextStream *stream)
     *stream << QString("extern BTRVFILE *File%1;").arg(getStructName()) << endl;
     *stream << QString("extern int iOpen%1 (int OpenMode);").arg(getStructName()) << endl << endl;
 
+    foreach (FmtIndex *ind, indeces)
+    {
+        QString func = QString("int Find%1%2(")
+                .arg(sStructName)
+                .arg(ind->getKeyNum() + 1);
+
+        for (int i = 0; i < ind->getFldCount(); i++)
+        {
+            const FmtField *f = ind->getField(i);
+            func += f->getTypeName2() +
+                    (f->getType() != FmtField::fmt_charptr ? QString(" ") : QString::null) + f->getName();
+            func += ", ";
+        }
+        func += QString("%1 *buf)").
+                arg(sStructName);
+        findFuncNames.append(func);
+    }
+
+    foreach (QString s, findFuncNames) {
+        *stream << "extern " << s << ";" << endl;
+    }
+
+    *stream << endl;
+
     *stream << "//----------------------------------------------------------------------------" << endl;
     *stream << QString("// Файл %1").arg(getBFileName()) << endl;
     *stream << "//----------------------------------------------------------------------------" << endl;
@@ -305,6 +336,46 @@ void FmtObject::makeOpener(QTextStream *stream)
     *stream << QString("\treturn bfOpen( &File%1, FileName, OpenMode, sizeof(%1), sizeof(%1_KEYS), 0, NULL, NULL, NULL, NULL );")
             .arg(getStructName()) << endl;
     *stream << "}" << endl;
+
+    int i = 0;
+    foreach (FmtIndex *ind, indeces)
+    {
+        *stream << endl;
+        *stream << findFuncNames[i] << endl;
+        *stream << "{" << endl;
+
+        *stream << QString("\t%1_KEYS KB;").arg(sStructName) << endl;
+        *stream << QString("\tmemset(&KB, 0, sizeof(%1_KEYS));").arg(sStructName) << endl;
+
+        for (int i = 0; i < ind->getFldCount(); i++)
+        {
+            const FmtField *f = ind->getField(i);
+            if (f->getType() != FmtField::fmt_charptr)
+            {
+                *stream << QString("\tKB.k%1.%2 = %2;")
+                           .arg(ind->getKeyNum() + 1)
+                           .arg(f->getName())
+                        << endl;
+            }
+            else
+            {
+                *stream << QString("\tstrcpy_s(KB.k%1.%2, klen(%3, %2), %2);")
+                           .arg(ind->getKeyNum() + 1)
+                           .arg(f->getName())
+                           .arg(sStructName)
+                        << endl;
+            }
+        }
+
+        *stream << endl;
+        *stream << QString("\treturn CB_FindRecord(&File%1, iOpen%1, %1_KEY%2, &KB, buf, \"\");\n")
+                   .arg(sStructName)
+                   .arg(ind->getKeyNum() + 1);
+
+        *stream << "}" << endl;
+
+        ++ i;
+    }
 }
 
 void FmtObject::makeStruct(QTextStream *stream)
@@ -370,7 +441,9 @@ void FmtObject::makeKeysUnion(QTextStream *stream)
         }
         *stream << endl;
     }
-    *stream << "} " << sStructName << "_KEYNUM;" << endl;
+    *stream << "} " << sStructName << "_KEYNUM;" << endl << endl;
+
+
 }
 
 void FmtObject::generateSqls(QTextStream *tablessql, QTextStream *plslq)
@@ -395,7 +468,7 @@ void FmtObject::generateSqls(QTextStream *tablessql, QTextStream *plslq)
 
         *tablessql << endl;
     }
-    *tablessql << ");" << endl << endl;
+    *tablessql << ")" << (isTmp() ? " ON COMMIT PRESERVE ROWS" : "") << ";" << endl << endl;
 
     *tablessql << QString("COMMENT ON TABLE %1 IS '%2';")
                   .arg(getName().toUpper())

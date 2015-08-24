@@ -108,7 +108,8 @@ SqlHighlighter::SqlHighlighter(QTextDocument *parent)
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
 
-    typeFormat.setForeground(Qt::darkRed);
+    typeFormat.setForeground(Qt::red);
+    typeFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
     keywordPatterns << "\\bVARCHAR2\\b"
                     << "\\bNVARCHAR2\\b"

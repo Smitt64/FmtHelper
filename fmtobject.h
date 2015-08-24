@@ -31,6 +31,7 @@ public:
     qint16 getType() const { return _type; }
     qint32 getSize() const { return _size; }
     QString getTypeName() const;
+    QString getTypeName2() const;
     QString getOraTypeName() const;
 
     QString getCppDecl() const { return _cppDecl; }
@@ -78,6 +79,7 @@ private:
     QString tryToFormatField(const QString &name);
     QString name, comment, sStructName;
     qint32 id;
+    QStringList findFuncNames;
 
     QMap<qint32, FmtField*> fields;
     QList<FmtIndex*> indeces;
