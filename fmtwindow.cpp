@@ -3,6 +3,7 @@
 #include "oracleauthdlg.h"
 #include "fmtobject.h"
 #include "fmtgenrunnable.h"
+#include "dragablefmtlistview.h"
 #include <QMessageBox>
 #include <QThreadPool>
 #include <QSqlError>
@@ -50,7 +51,7 @@ void FmtWindow::init()
     tablesSqlHlght = new SqlHighlighter(tablesSql->document());
     updScriptHlght = new SqlHighlighter(updScriptCodeEditor->document());
 
-    fmtList = new QListView(this);
+    fmtList = new DragableFmtListView(this);
     fmtModel = new FmtListModel(&db, this);
     fmtList->setModel(fmtModel);
 
@@ -58,10 +59,13 @@ void FmtWindow::init()
     dock->setWidget(fmtList);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
 
+    cusTab = new CustomUpdateScript(db, this);
+
     tabWidget = new QTabWidget(this);
     tabWidget->addTab(cppCodeEditor, QIcon(":/cplusplus"), tr("C++ Код"));
     tabWidget->addTab(tablesSql, QIcon(":/sql"), tr("tables.sql"));
-    tabWidget->addTab(updScriptCodeEditor, QIcon(":/sql"), tr("update script"));
+    tabWidget->addTab(updScriptCodeEditor, QIcon(":/sql"), tr("Update script"));
+    tabWidget->addTab(cusTab, QIcon(":/sql"), tr("update script 2"));
     setCentralWidget(tabWidget);
     fmtModel->updateFmtModel();
 
@@ -152,6 +156,16 @@ void FmtWindow::onGenerationFinish(const qint16 &result)
     inGenerate = false;
 }
 
+void FmtWindow::addTable()
+{
+    QModelIndex index = fmtList->currentIndex();
+
+    if (index.isValid())
+    {
+        cusTab->getTree()->addTable(fmtModel->getId(index).data().toInt(), index.data().toString());
+    }
+}
+
 void FmtWindow::onFmtListDoubleClicked(const QModelIndex &index)
 {
     FmtGenRunnable *gen = new FmtGenRunnable(index, db);
@@ -175,11 +189,19 @@ void FmtWindow::save()
     {
     case 0: //c++
         filter = "C files (*.c)";
-        editor = cppCodeEditor;
+        editor = static_cast<CodeEditor*>(tabWidget->currentWidget());
         break;
     case 1: // tables.sql
         filter = "Sql files (*.sql)";
-        editor = tablesSql;
+        editor = static_cast<CodeEditor*>(tabWidget->currentWidget());
+        break;
+    case 2:
+        filter = "Sql files (*.sql)";
+        editor = static_cast<CodeEditor*>(tabWidget->currentWidget());
+        break;
+    case 3:
+        filter = "Sql files (*.sql)";
+        editor = cusTab->getEditor();
         break;
     default:
         res = false;

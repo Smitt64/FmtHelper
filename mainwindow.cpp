@@ -2,6 +2,9 @@
 #include "ui_mainwindow.h"
 #include <QMdiSubWindow>
 #include "fmtwindow.h"
+#ifdef WINEXTRAS
+#include <QtWinExtras/QtWin>
+#endif
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->addAction(ui->actionFindNext);
     ui->mainToolBar->addAction(ui->actionCppRefrsh);
     ui->mainToolBar->addAction(ui->actionTablesRefresh);
+    ui->mainToolBar->addAction(ui->actionAddTable);
 
     ui->actionSave->setShortcut(QKeySequence(QKeySequence::Save));
     ui->actionFind->setShortcut(QKeySequence(QKeySequence::Find));
@@ -30,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionCppRefrsh->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
     ui->actionTablesRefresh->setShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_R));
     ui->actionFindNext->setShortcut(QKeySequence(Qt::Key_F3));
+    ui->actionAddTable->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
 
     setWindowIcon(QIcon(":/icon"));
 
@@ -37,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionFind, SIGNAL(triggered(bool)), SLOT(findFirst()));
     connect(ui->actionFindNext, SIGNAL(triggered(bool)), SLOT(findNext()));
     connect(ui->actionSave, SIGNAL(triggered(bool)), SLOT(save()));
+    connect(ui->actionAddTable, SIGNAL(triggered(bool)), SLOT(addTable()));
 }
 
 MainWindow::~MainWindow()
@@ -93,4 +99,15 @@ void MainWindow::save()
 
     FmtWindow *w = (FmtWindow*)window->widget();
     w->save();
+}
+
+void MainWindow::addTable()
+{
+    QMdiSubWindow *window = mdi->currentSubWindow();
+
+    if (!window)
+        return;
+
+    FmtWindow *w = (FmtWindow*)window->widget();
+    w->addTable();
 }

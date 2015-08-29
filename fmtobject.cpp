@@ -147,6 +147,42 @@ QString FmtField::getOracleTypeName(const qint16 &type)
     return t;
 }
 
+QString FmtField::getOraDefaultVal() const
+{
+    QString t;
+    switch(_type)
+    {
+    case fmt_int16:
+        t = "0";
+        break;
+    case fmt_int32:
+        t = "0";
+        break;
+    /*case fmt_float:
+        t = "float";
+        break;*/
+    case fmt_char:
+        t = "chr(0)";
+        break;
+    case fmt_charptr:
+        t = "chr(1)";
+        break;
+    case fmt_bdate:
+        t = "TO_DATE('01/01/0001', 'MM/DD/YYYY')";
+        break;
+    case fmt_btime:
+        t = "TO_DATE('01/01/00011 00:00:00 AM','MM/DD/YYYY HH:MI:SS')";
+        break;
+    case fmt_lmoney:
+        t = "0.0";
+        break;
+    default:
+        t = "<unknown>";
+    }
+
+    return t;
+}
+
 bool FmtField::operator == (const FmtField &other)
 {
     return _id == other._id;
@@ -159,15 +195,25 @@ bool FmtField::operator == (const qint32 &id)
 
 // ========================================================================
 
-FmtObject::FmtObject(const QModelIndex &fmtnames, const QSqlDatabase &db):
-    fTmp(false)
+FmtObject::FmtObject(const QModelIndex &fmtnames, const QSqlDatabase &db)
+{
+    QModelIndex idindex = fmtnames.model()->index(fmtnames.row(), 2);
+    init(idindex.data().toInt(), db);
+}
+
+FmtObject::FmtObject(const qint32 &id, const QSqlDatabase &db)
+{
+    init(id, db);
+}
+
+void FmtObject::init(const qint32 &id, const QSqlDatabase &db)
 {
     _db = db;
-
+    fTmp = false;
     QSqlQuery q(_db);
     q.prepare("select T_NAME, T_COMMENT, T_ID from FMT_NAMES WHERE T_ID = ?");
-    QModelIndex idindex = fmtnames.model()->index(fmtnames.row(), 2);
-    q.bindValue(0, idindex.data(Qt::DisplayRole).toInt());
+
+    q.bindValue(0, id);
 
     if (!q.exec())
     {
@@ -177,7 +223,7 @@ FmtObject::FmtObject(const QModelIndex &fmtnames, const QSqlDatabase &db):
     q.next();
     name = q.value(0).toString();
     comment = q.value(1).toString();
-    id = idindex.data(Qt::DisplayRole).toInt();
+    this->id = id;
 
     if (name.contains("_tmp", Qt::CaseInsensitive))
         fTmp = true;
@@ -532,4 +578,9 @@ void FmtObject::generateUpdateScript(QTextStream *stream)
 void FmtObject::generateAlterUpdateScript(QTextStream *stream)
 {
 
+}
+
+FmtField *FmtObject::getField(const qint32 &id)
+{
+    return fields[id];
 }

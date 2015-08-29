@@ -30,12 +30,14 @@ public:
     QString getOraName() const { return _oraName; }
     qint16 getType() const { return _type; }
     qint32 getSize() const { return _size; }
+    qint32 getId() const { return _id; }
     QString getTypeName() const;
     QString getTypeName2() const;
     QString getOraTypeName() const;
 
     QString getCppDecl() const { return _cppDecl; }
     QString getOraDecl() const { return _oraDecl; }
+    QString getOraDefaultVal() const;
 
     static QString getCppTypeName(const qint16 &type);
     static QString getOracleTypeName(const qint16 &type);
@@ -55,7 +57,9 @@ class FmtObject
 {
     friend class FmtIndex;
 public:
+    FmtObject() {}
     FmtObject(const QModelIndex &fmtnames, const QSqlDatabase &db);
+    FmtObject(const qint32 &id, const QSqlDatabase &db);
     QString getName() const { return name; }
     QString getComment() const { return comment; }
     QString getStructName() const { return sStructName; }
@@ -73,6 +77,13 @@ public:
     qint16 calcMaxCppLenght(qint16 *maxfieldname);
     qint16 calcMaxOraLenght(qint16 *maxfieldname);
 
+    QMap<qint32, FmtField*> *getFieldsPtr() { return &fields; }
+    QMap<qint32, FmtField*> &getFields() { return fields; }
+
+    FmtField *getField(const qint32 &id);
+
+    void init(const qint32 &id, const QSqlDatabase &db);
+
 private:
     void makeOpener(QTextStream *stream);
     void makeStruct(QTextStream *stream);
@@ -89,5 +100,7 @@ private:
     bool fTmp;
     QSqlDatabase _db;
 };
+
+Q_DECLARE_METATYPE(FmtObject)
 
 #endif // FMTOBJECT_H

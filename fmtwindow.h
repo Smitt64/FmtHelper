@@ -11,6 +11,7 @@
 #include "fmtlistmodel.h"
 #include "codeeditor.h"
 #include "highlighter.h"
+#include "customupdatescript.h"
 
 namespace Ui {
 class FmtWindow;
@@ -30,6 +31,7 @@ public:
     void findFirst();
     void findNext();
     void save();
+    void addTable();
 
     QString connectionName() const;
 
@@ -55,6 +57,8 @@ private:
     FmtListModel *fmtModel;
     Highlighter *cppHighlighter;
     SqlHighlighter *tablesSqlHlght, *updScriptHlght;
+
+    CustomUpdateScript *cusTab;
 };
 
 #endif // FMTWINDOW_H

@@ -46,6 +46,7 @@
     <addaction name="separator"/>
     <addaction name="actionCppRefrsh"/>
     <addaction name="actionTablesRefresh"/>
+    <addaction name="actionAddTable"/>
    </widget>
    <addaction name="menuConnection"/>
    <addaction name="menu"/>
@@ -111,6 +112,24 @@
    </property>
    <property name="text">
     <string>Сохранить</string>
+   </property>
+  </action>
+  <action name="actionAddTable">
+   <property name="icon">
+    <iconset resource="fmt.qrc">
+     <normaloff>:/addtable</normaloff>:/addtable</iconset>
+   </property>
+   <property name="text">
+    <string>Добавить таблицу</string>
+   </property>
+   <property name="iconText">
+    <string>Добавить таблицу в скрип обновления</string>
+   </property>
+   <property name="toolTip">
+    <string>Добавить таблицу в скрип обновления</string>
+   </property>
+   <property name="statusTip">
+    <string>Добавить таблицу в скрип обновления</string>
    </property>
   </action>
  </widget>

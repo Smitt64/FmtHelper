@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlQueryModel>
 #include <QIcon>
+#include "customupdatescript.h"
 
 class FmtListModel : public QSqlQueryModel
 {
@@ -13,6 +14,7 @@ public:
 
 public slots:
     void updateFmtModel();
+    QModelIndex getId(const QModelIndex &index) const;
 
 signals:
     void findItemSelection(const QModelIndex &item);
@@ -22,6 +24,7 @@ public slots:
     void findNext();
 
 protected:
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
     virtual QVariant data(const QModelIndex &item, int role = Qt::DisplayRole) const;
 
 private:

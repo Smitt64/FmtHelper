@@ -50,6 +50,22 @@ void FmtListModel::findNext()
     }
 }
 
+QModelIndex FmtListModel::getId(const QModelIndex &index) const
+{
+    return index.model()->index(index.row(), 2);
+}
+
+Qt::ItemFlags FmtListModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags defaultFlags = QSqlQueryModel::flags(index);
+
+    /*if (index.isValid())
+        return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | defaultFlags;
+    else
+        return Qt::ItemIsDropEnabled | defaultFlags;*/
+    return defaultFlags;
+}
+
 QVariant FmtListModel::data(const QModelIndex &item, int role) const
 {
     if (item.column() != 0)

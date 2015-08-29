@@ -6,7 +6,15 @@
 
 QT       += core gui sql
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets
+
+    win32 {
+        packagesExist(QtWinExtras)  {
+            DEFINES += WINEXTRAS
+        }
+    }
+}
 
 TARGET = FmtHelper
 TEMPLATE = app
@@ -20,7 +28,10 @@ SOURCES += main.cpp\
     fmtlistmodel.cpp \
     fmtobject.cpp \
     fmtindex.cpp \
-    fmtgenrunnable.cpp
+    fmtgenrunnable.cpp \
+    customupdatescript.cpp \
+    dragablefmtlistview.cpp \
+    sqlcodedialog.cpp
 
 HEADERS  += mainwindow.h \
     codeeditor.h \
@@ -30,7 +41,10 @@ HEADERS  += mainwindow.h \
     fmtlistmodel.h \
     fmtobject.h \
     fmtindex.h \
-    fmtgenrunnable.h
+    fmtgenrunnable.h \
+    customupdatescript.h \
+    dragablefmtlistview.h \
+    sqlcodedialog.h
 
 FORMS    += mainwindow.ui \
     fmtwindow.ui \

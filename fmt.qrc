@@ -15,5 +15,6 @@
         <file alias="sql">img/SQL.png</file>
         <file alias="icon">img/icon.png</file>
         <file alias="save">img/saveHS.png</file>
+        <file alias="addtable">img/AddTableHS.png</file>
     </qresource>
 </RCC>
