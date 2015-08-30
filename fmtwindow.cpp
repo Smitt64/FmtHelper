@@ -131,7 +131,7 @@ void FmtWindow::onFoundCurItem(const QModelIndex &index)
 
 void FmtWindow::fillFmtNames()
 {
-
+    fmtModel->updateFmtModel();
 }
 
 void FmtWindow::onStepGenFinish(const QString &text, const qint16 &step)
@@ -164,6 +164,11 @@ void FmtWindow::addTable()
     {
         cusTab->getTree()->addTable(fmtModel->getId(index).data().toInt(), index.data().toString());
     }
+}
+
+void FmtWindow::updateCppCode()
+{
+    onFmtListDoubleClicked(fmtList->currentIndex());
 }
 
 void FmtWindow::onFmtListDoubleClicked(const QModelIndex &index)

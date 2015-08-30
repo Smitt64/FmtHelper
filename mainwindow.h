@@ -22,6 +22,8 @@ private slots:
     void findNext();
     void save();
     void addTable();
+    void updateTableList();
+    void updateCppCode();
 
 private:
     QMdiArea *mdi;

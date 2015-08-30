@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionFindNext, SIGNAL(triggered(bool)), SLOT(findNext()));
     connect(ui->actionSave, SIGNAL(triggered(bool)), SLOT(save()));
     connect(ui->actionAddTable, SIGNAL(triggered(bool)), SLOT(addTable()));
+    connect(ui->actionTablesRefresh, SIGNAL(triggered(bool)), SLOT(updateTableList()));
+    connect(ui->actionCppRefrsh, SIGNAL(triggered(bool)), SLOT(updateCppCode()));
 }
 
 MainWindow::~MainWindow()
@@ -110,4 +112,26 @@ void MainWindow::addTable()
 
     FmtWindow *w = (FmtWindow*)window->widget();
     w->addTable();
+}
+
+void MainWindow::updateTableList()
+{
+    QMdiSubWindow *window = mdi->currentSubWindow();
+
+    if (!window)
+        return;
+
+    FmtWindow *w = (FmtWindow*)window->widget();
+    w->fillFmtNames();
+}
+
+void MainWindow::updateCppCode()
+{
+    QMdiSubWindow *window = mdi->currentSubWindow();
+
+    if (!window)
+        return;
+
+    FmtWindow *w = (FmtWindow*)window->widget();
+    w->updateCppCode();
 }

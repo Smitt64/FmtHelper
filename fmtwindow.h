@@ -37,6 +37,7 @@ public:
 
 public slots:
     void fillFmtNames();
+    void updateCppCode();
 
 private slots:
     void onFmtListDoubleClicked(const QModelIndex &index);
